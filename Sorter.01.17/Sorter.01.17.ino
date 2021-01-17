@@ -30,22 +30,26 @@ void loop() {
   rotateServo();
   float red, green, blue;
 
-//  delay(60);  // takes 50ms to read -- With this commented, the sensor scans two values per bad bean
+  delay(60);  // takes 50ms to read -- With this commented, the sensor scans two values per bad bean
   tcs.getRGB(&red, &green, &blue);
 
   //  Serial.print("R:\t"); Serial.print(int(red));
   //  Serial.print("\tG:\t"); Serial.print(int(green));
   //  Serial.print("\tB:\t"); Serial.print(int(blue));
 
-  if (red > 70 && blue <= 73) { //red > 75 && blue <= 75
-    Serial.println("\n----------------Bad bean--------------------");
-    Serial.print("R:\t"); Serial.print(int(red));
-    Serial.print("\tG:\t"); Serial.print(int(green));
-    Serial.print("\tB:\t"); Serial.print(int(blue));
+  if (!checkBean(red, green, blue)) { //previous if clause: red > 70 && blue <= 73
+    printRGB(red, green, blue);
     badBean();
-    Serial.println("\n--------------------------------------------");
   } else {
     goodBean();
+  }
+}
+
+boolean checkBean(float red, float green, float blue){ //true is good bean, false is bad bean
+  if ((red > 70 && red < 100) && (blue > 64 && blue < 74)){
+    return true;
+  }else{
+    return false;
   }
 }
 
@@ -59,4 +63,17 @@ void goodBean() {
 
 void rotateServo() {
   rServo.write(rServoSpeed);
+}
+
+void printRGB(float red, float green, float blue){
+  //    Serial.print("R:\t"); 
+    Serial.print(int(red));
+    Serial.print(",");
+//    Serial.print("\tG:\t"); 
+    Serial.print(int(green));
+    Serial.print(",");
+//    Serial.print("\tB:\t"); 
+    Serial.print(int(blue));
+    Serial.print(",");
+    Serial.println();
 }
