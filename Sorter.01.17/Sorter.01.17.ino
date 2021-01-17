@@ -21,10 +21,6 @@ int rServoSpeed = 89;
 Servo dServo;
 Servo rServo;
 
-///////////// Stepper Motor /////////////
-//#define STEPS 2038 // the number of steps in one revolution of your motor (28BYJ-48)
-//Stepper stepper(STEPS, 2, 4, 6, 5);
-
 Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
 
 ///////////// Setup /////////////
@@ -72,17 +68,14 @@ void setup() {
 void loop() {
   rotateServo();
   float red, green, blue;
-  tcs.setInterrupt(false);  // turn on LED
 
   delay(60);  // takes 50ms to read
   rotateServo();
   tcs.getRGB(&red, &green, &blue);
   
-  tcs.setInterrupt(true);  // turn off LED
-
-  Serial.print("R:\t"); Serial.print(int(red)); 
-  Serial.print("\tG:\t"); Serial.print(int(green)); 
-  Serial.print("\tB:\t"); Serial.print(int(blue)); 
+//  Serial.print("R:\t"); Serial.print(int(red)); 
+//  Serial.print("\tG:\t"); Serial.print(int(green)); 
+//  Serial.print("\tB:\t"); Serial.print(int(blue)); 
 
   if (red > 70 && blue <= 73){ //red > 75 && blue <= 75
     Serial.println("\n----------------Bad bean--------------------");
@@ -94,19 +87,6 @@ void loop() {
   }else{
     goodBean();
   }
-
-  Serial.print("\n");
-  rotateServo();
-  #if defined(ARDUINO_ARCH_ESP32)
-    ledcWrite(1, gammatable[(int)red]);
-    ledcWrite(2, gammatable[(int)green]);
-    ledcWrite(3, gammatable[(int)blue]);
-  #else
-    analogWrite(redpin, gammatable[(int)red]);
-    analogWrite(greenpin, gammatable[(int)green]);
-    analogWrite(bluepin, gammatable[(int)blue]);
-  #endif
-  rotateServo();
 }
 
 void badBean(){
