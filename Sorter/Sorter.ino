@@ -11,6 +11,21 @@ Servo rServo;
 
 Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
 
+////RGB Mins/Maxes
+float redMin = 69.9;
+float redMax = 76.2;
+float greenMin = 80.1;
+float greenMax = 93.5;
+float blueMin = 70.5;
+float blueMax = 79;
+
+//float redMin = 69;
+//float redMax = 255;
+//float greenMin = 78;
+//float greenMax = 255;
+//float blueMin = 0;
+//float blueMax = 80;
+
 ///////////// Setup /////////////
 void setup() {
   dServo.attach(directionalServo);
@@ -30,14 +45,14 @@ void loop() {
   rotateServo();
   float red, green, blue;
 
-  delay(60);  // takes 50ms to read -- With this commented, the sensor scans two values per bad bean
+  delay(70);  // takes 50ms to read -- With this commented, the sensor scans two values per bad bean
   tcs.getRGB(&red, &green, &blue);
 
   //  Serial.print("R:\t"); Serial.print(int(red));
   //  Serial.print("\tG:\t"); Serial.print(int(green));
   //  Serial.print("\tB:\t"); Serial.print(int(blue));
 
-  if (!checkBean(red, green, blue)) { //previous if clause: red > 70 && blue <= 73
+  if (checkBean(red, green, blue)) { //previous if clause: red > 70 && blue <= 73
     printRGB(red, green, blue);
     badBean();
   } else {
@@ -46,7 +61,9 @@ void loop() {
 }
 
 boolean checkBean(float red, float green, float blue){ //true is good bean, false is bad bean
-  if ((red > 70 && red < 100) && (blue > 64 && blue < 74)){
+  if ((red >= redMin && red <= redMax) && 
+  (green >= greenMin && green <= greenMax) && 
+  (blue >= blueMin && blue <= blueMax)){
     return true;
   }else{
     return false;
@@ -67,13 +84,13 @@ void rotateServo() {
 
 void printRGB(float red, float green, float blue){
   //    Serial.print("R:\t"); 
-    Serial.print(int(red));
+    Serial.print(red);
     Serial.print(",");
 //    Serial.print("\tG:\t"); 
-    Serial.print(int(green));
+    Serial.print(green);
     Serial.print(",");
 //    Serial.print("\tB:\t"); 
-    Serial.print(int(blue));
+    Serial.print(blue);
     Serial.print(",");
     Serial.println();
 }
