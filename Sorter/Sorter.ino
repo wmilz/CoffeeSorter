@@ -12,11 +12,11 @@ Servo rServo;
 Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
 
 ////RGB Mins/Maxes
-float redMin = 69.9;
+float redMin = 74.54;
 float redMax = 76.2;
-float greenMin = 80.1;
+float greenMin = 87.9;
 float greenMax = 93.5;
-float blueMin = 70.5;
+float blueMin = 70.51;
 float blueMax = 79;
 
 //float redMin = 69;
