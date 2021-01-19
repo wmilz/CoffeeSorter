@@ -9,15 +9,17 @@ int rServoSpeed = 89;
 Servo dServo;
 Servo rServo;
 
+String state = "good";
+
 Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
 
 ////RGB Mins/Maxes
-float redMin = 74.54;
-float redMax = 76.2;
-float greenMin = 87.9;
-float greenMax = 93.5;
-float blueMin = 70.51;
-float blueMax = 79;
+float redMin = 68;
+float redMax = 71;
+float greenMin = 81.5;
+float greenMax = 95;
+float blueMin = 60;
+float blueMax = 74.5;
 
 //float redMin = 69;
 //float redMax = 255;
@@ -41,21 +43,25 @@ void setup() {
 }
 
 ///////////// Loop /////////////
-void loop() {
+void loop() {  
   rotateServo();
+  directServo();
   float red, green, blue;
 
-  delay(70);  // takes 50ms to read -- With this commented, the sensor scans two values per bad bean
+  delay(100);  // takes 50ms to read -- With this commented, the sensor scans two values per bad bean
   tcs.getRGB(&red, &green, &blue);
 
-  //  Serial.print("R:\t"); Serial.print(int(red));
-  //  Serial.print("\tG:\t"); Serial.print(int(green));
-  //  Serial.print("\tB:\t"); Serial.print(int(blue));
-
+//    Serial.print("R:\t"); Serial.print(int(red));
+//    Serial.print("\tG:\t"); Serial.print(int(green));
+//    Serial.print("\tB:\t"); Serial.println(int(blue));
+  directServo();
   if (checkBean(red, green, blue)) { //previous if clause: red > 70 && blue <= 73
-    printRGB(red, green, blue);
+//    printRGB(red, green, blue);
     badBean();
-  } else {
+  } else if (!checkBean(red, green, blue)){
+    if (green < 90){
+      printRGB(red,green,blue);
+    }
     goodBean();
   }
 }
@@ -71,11 +77,22 @@ boolean checkBean(float red, float green, float blue){ //true is good bean, fals
 }
 
 void badBean() {
-  dServo.write(0);
+  state = "bad";
+  directServo();
+  delay(1000);
 }
 
 void goodBean() {
-  dServo.write(90);
+  state = "good";
+  directServo();
+}
+
+void directServo()  {
+  if (state == "bad"){
+    dServo.write(70);
+  } else if (state == "good"){
+    dServo.write(150);
+  }
 }
 
 void rotateServo() {
