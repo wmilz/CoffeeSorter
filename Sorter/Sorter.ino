@@ -5,6 +5,8 @@
 ///////////// Servo /////////////
 int directionalServo = 9;
 int rotationalServo = 3;
+
+//int rServoSpeed = 89;
 int rServoSpeed = 89;
 Servo dServo;
 Servo rServo;
@@ -14,19 +16,28 @@ String state = "good";
 Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
 
 ////RGB Mins/Maxes
-float redMin = 68;
-float redMax = 71;
+//float redMin = 68; //worked well
+//float redMax = 73;
+//float greenMin = 81.5;
+//float greenMax = 95;
+//float blueMin = 60;
+//float blueMax = 74.5;
+
+float redMin = 70.5;
+float redMax = 73;
 float greenMin = 81.5;
 float greenMax = 95;
 float blueMin = 60;
-float blueMax = 74.5;
+float blueMax = 74.2;
 
-//float redMin = 69;
-//float redMax = 255;
-//float greenMin = 78;
-//float greenMax = 255;
-//float blueMin = 0;
-//float blueMax = 80;
+///////////// Internal Counters /////////////
+float tempRed = 0.0;
+float tempGreen = 0.0;
+float tempBlue = 0.0;
+float redAvg = 0.0;
+float greenAvg = 0.0;
+float blueAvg = 0.0;
+int readCount = 0;
 
 ///////////// Setup /////////////
 void setup() {
@@ -48,28 +59,46 @@ void loop() {
   directServo();
   float red, green, blue;
 
-  delay(100);  // takes 50ms to read -- With this commented, the sensor scans two values per bad bean
+  delay(60);  // takes 50ms to read -- With this commented, the sensor scans two values per bad bean
   tcs.getRGB(&red, &green, &blue);
 
 //    Serial.print("R:\t"); Serial.print(int(red));
 //    Serial.print("\tG:\t"); Serial.print(int(green));
 //    Serial.print("\tB:\t"); Serial.println(int(blue));
   directServo();
-  if (checkBean(red, green, blue)) { //previous if clause: red > 70 && blue <= 73
-//    printRGB(red, green, blue);
-    badBean();
-  } else if (!checkBean(red, green, blue)){
-    if (green < 90){
-      printRGB(red,green,blue);
+
+  if (((int(red) < 100)&&(int(green) > 90)&&(int(blue) < 190)) || ((int(red) >= 100)&&(int(green) > 98)&&(int(blue) > 85))){
+    if (redAvg != 0 && greenAvg != 0 && blueAvg != 0){
+      boolean beanIsBad = checkBean(redAvg, greenAvg, blueAvg);
+      if (beanIsBad){
+        badBean();
+        printRGB(redAvg, greenAvg, blueAvg);
+      }else{
+        goodBean();
+        printRGB(redAvg, greenAvg, blueAvg);
+      }
     }
-    goodBean();
+    resetCounters();
+  }else{
+    tempRed = tempRed + red;
+    tempGreen = tempGreen + green;
+    tempBlue = tempBlue + blue;
+    readCount++;
+    redAvg = tempRed/readCount;
+    greenAvg = tempGreen/readCount;
+    blueAvg = tempBlue/readCount;
   }
 }
 
 boolean checkBean(float red, float green, float blue){ //true is good bean, false is bad bean
-  if ((red >= redMin && red <= redMax) && 
+//    Serial.println("bean scanned");
+//    Serial.print("R:\t"); Serial.print((red));
+//    Serial.print("\tG:\t"); Serial.print((green));
+//    Serial.print("\tB:\t"); Serial.println((blue));
+//    Serial.println("------------------------");
+if (((red >= redMin && red <= redMax) && 
   (green >= greenMin && green <= greenMax) && 
-  (blue >= blueMin && blue <= blueMax)){
+  (blue >= blueMin && blue <= blueMax))){
     return true;
   }else{
     return false;
@@ -89,7 +118,7 @@ void goodBean() {
 
 void directServo()  {
   if (state == "bad"){
-    dServo.write(70);
+    dServo.write(90);
   } else if (state == "good"){
     dServo.write(150);
   }
@@ -109,5 +138,24 @@ void printRGB(float red, float green, float blue){
 //    Serial.print("\tB:\t"); 
     Serial.print(blue);
     Serial.print(",");
+    Serial.print(state);
+    Serial.print(",");
     Serial.println();
+}
+
+void resetCounters(){
+    if (tempRed != 0)
+      tempRed = 0;
+    if (tempGreen != 0)
+      tempGreen = 0;
+    if (tempBlue != 0)
+      tempBlue = 0;
+    if (redAvg != 0)
+      redAvg = 0;
+    if (greenAvg != 0)
+      greenAvg = 0;
+    if (blueAvg != 0)
+      blueAvg = 0;
+    if (readCount != 0)
+      readCount = 0;
 }
