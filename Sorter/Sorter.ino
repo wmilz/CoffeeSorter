@@ -23,12 +23,12 @@ Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS3472
 //float blueMin = 60;
 //float blueMax = 74.5;
 
-float redMin = 70.5;
+float redMin = 70;
 float redMax = 73;
-float greenMin = 81.5;
-float greenMax = 95;
-float blueMin = 60;
-float blueMax = 74.2;
+float greenMin = 82.8;
+float greenMax = 255;
+float blueMin = 73.6;
+float blueMax = 76.4;
 
 ///////////// Internal Counters /////////////
 float tempRed = 0.0;
@@ -98,7 +98,11 @@ boolean checkBean(float red, float green, float blue){ //true is good bean, fals
 //    Serial.println("------------------------");
 if (((red >= redMin && red <= redMax) && 
   (green >= greenMin && green <= greenMax) && 
-  (blue >= blueMin && blue <= blueMax))){
+  (blue <= 75))
+  ||
+  ((red >= 68 && red < 70)&&(blue  < 75.5))
+  ||
+  ((red < 68)&&(blue  < 75.8))){
     return true;
   }else{
     return false;
