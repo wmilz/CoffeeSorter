@@ -1,4 +1,5 @@
-#include <Servo.h>
+# 1 "c:\\Users\\15862\\Documents\\GitHub\\CoffeeSorter\\Sorter\\Sorter.ino"
+# 2 "c:\\Users\\15862\\Documents\\GitHub\\CoffeeSorter\\Sorter\\Sorter.ino" 2
 
 int rotationalServoPin = 3;
 int rotationalServoCurrentSensorPin = A0;
@@ -13,13 +14,13 @@ int buttonState = 0;
 void setup(){
   rotationalServo.attach(rotationalServoPin);
   Serial.begin(9600);
-  pinMode(reverseServoButtonPin, INPUT);
+  pinMode(reverseServoButtonPin, 0x0);
 }
 
 void loop(){
   buttonState = digitalRead(reverseServoButtonPin);
   Serial.println(buttonState);
-  if (buttonState == HIGH) {
+  if (buttonState == 0x1) {
     reverseServo();
   }else{
     rotateServo();
